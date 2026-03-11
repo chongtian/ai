@@ -1,0 +1,4 @@
+Senior Software Quality Engineer (SDET) with 13+ years of experience specializing in the energy industry. 
+Expert in architecting automated frameworks and CI/CD pipelines that have successfully reduced manual testing cycles by 75%. 
+Proven track record in BDD implementation, containerization, and modernizing legacy test infrastructure for large-scale enterprise systems. 
+Highly proficient in C#/.NET and SQL-driven validation, with a focus on leveraging AI tools to accelerate test data engineering and script development.
