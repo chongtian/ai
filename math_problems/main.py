@@ -4,6 +4,7 @@ from get_problems import generate_and_save_math_problems, initialize_openai_llm,
 from kidproblem_apis import get_access_token_from_cognito
 import logging
 import sys
+from datetime import datetime
 
 from input_context import InputContext
 
@@ -22,7 +23,7 @@ PRODUCTION = False
 
 global access_token, llm
 
-def generate_problems(count: str, objective):
+def generate_problems(count: str, year: str, objective):
     if count.isdigit():
         count_of_problems = int(count)
     else:
@@ -33,6 +34,7 @@ def generate_problems(count: str, objective):
     if objective:
         input_context = InputContext(
             Count = count_of_problems,
+            ProblemYear=year,
             ObjectiveText= objective,
             AccessToken = access_token
         )
@@ -56,6 +58,7 @@ def generate_interface():
         )
     
         count = gr.Textbox(label="How many problems do you want to generate?", placeholder="1")
+        year = gr.Textbox(label="Which year do you want to use?", placeholder=f"C{datetime.today().strftime('%m%d')}")
     
         objective_input = gr.Textbox(label="Provide your objective", placeholder="Your objective", lines=5)
         result_output = gr.Textbox(label="Result", lines=5)
@@ -63,7 +66,7 @@ def generate_interface():
         generate_btn = gr.Button("Generate")
     
         # Set up button actions
-        generate_btn.click(generate_problems, inputs=[count, objective_input], outputs=result_output)
+        generate_btn.click(generate_problems, inputs=[count, year, objective_input], outputs=result_output)
     
     # Launch the app with specified server name and port
     interface.launch(server_name="127.0.0.1", server_port=7860)

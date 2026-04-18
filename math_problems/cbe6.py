@@ -59,11 +59,11 @@ def main(objective_num: int, start_num: int, production: bool):
 if __name__ == "__main__":
     args = sys.argv
     if len(args) < 3:
-        print("Usage: python cbe6.py <topic number> <start problem number> [prod]")
+        print("Usage: python cbe6.py <1-based topic number> <start problem number> [prod]")
         exit(1)
 
     if args[1].isdigit():
-        objective_num = int(args[1])
+        objective_num = int(args[1])-1
     else:
         # this will pull in all objectives
         objective_num = -1

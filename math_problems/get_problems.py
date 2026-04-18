@@ -30,7 +30,7 @@ def initialize_openai_llm():
     return ChatOpenAI(model=config.OPENAI_MODEL_ID, temperature=config.OPENAI_TEMPERATURE)
 
 
-def create_math_prompt_template():
+def create_math_prompt_template_1():
     """
     Create a PromptTemplate for generating math problems based on user example.
 
@@ -68,6 +68,80 @@ def create_math_prompt_template():
     
     prompt_template = PromptTemplate.from_template(math_template)
     return prompt_template
+
+
+def create_math_prompt_template_2():
+    """
+    Create a PromptTemplate for generating math problems based on user example.
+
+    Args:
+        None
+
+    Returns:
+        PromptTemplate: A PromptTemplate object configured for generating math problems.
+    """
+       
+    math_template = """
+    You are a Senior Math Teacher specializing in elementary and middle school education. 
+    You excel at creating engaging, grade-appropriate practice problems that reinforce core mathematical concepts.
+    Your task is to generate exactly {count} math practice problems based on the objective: 
+
+    {objective}
+
+    When generating math problems, follow all rules strictly:
+    1. Problem Structure
+    - Each problem must include exactly these fields:
+       * "ProblemText": Full problem including answer choices
+       * "ProblemAnswer": The correct option (A, B, C, or D)      
+       * "AnswerOptions": always "A,B,C,D"   
+    
+    2. Problem Content
+    - Most problems must be word problems of over 4 sentences, excluding the sentences of the Answer Choices.
+    - At most one problem may be a short (1 sentence) or simple expression-based problem.
+    - Ensure problems are clear, realistic, and mathematically sound.
+
+    3. Answer Choices
+    - Each problem must have exactly 4 options labeled A, B, C, D.
+    - Only one option is correct.
+    - All answer choices must be included inside "ProblemText" (not separately).
+    - Format answer choices like:
+        <br/>A. ...
+        <br/>B. ...
+        <br/>C. ...
+        <br/>D. ...
+        
+    4. LaTeX Formatting
+    - Use standard LaTeX for all math expressions.
+    - Inline math must be wrapped in $...$ (e.g., $x + 5 = 12$).
+    - Do NOT use LaTeX environments such as item, itemize, or similar.
+    - Ensure all LaTeX is valid and properly escaped for JSON.
+    - If the $ is used for US Dollar, escape it as \$.
+    
+    5. Line Breaks
+    - Use "<br/>" for all line breaks inside "ProblemText" except for LaTex and Asymptote code.
+    
+    6. Charts / Diagrams (if needed)
+    - If a chart or diagram is required:
+      * Generate valid Asymptote code only (no comments, no extra text, no line break).
+      * The code must compile in standard environments.
+      * Embed using:
+             <img src="PlaceHolder_<sequence>.png" alt="[asy] ...code... [/asy]" />
+    
+    7. Correctness & Validation
+    Ensure:
+    - The correct answer matches "ProblemAnswer".
+    - All distractors are plausible but incorrect.
+    - JSON output is valid and properly escaped.
+    
+    8. Output Format
+    Output all problems as an json array using this json schema:
+       {schema} 
+
+    """
+    
+    prompt_template = PromptTemplate.from_template(math_template)
+    return prompt_template
+
 
 
 def get_json_schema(simple_schema = False) -> str:
@@ -190,7 +264,7 @@ def generate_cbe6_math_problems(llm, objective_num: int, simple_schema = False):
         }
     """
 
-    prompt = create_math_prompt_template()
+    prompt = create_math_prompt_template_2()
     json_parser = JsonOutputParser()
     text_parser = StrOutputParser()
     save_response = RunnableLambda(lambda x: save_text_and_pass(x))
@@ -233,12 +307,12 @@ def generate_and_save_math_problems(llm, input_context: InputContext):
     if not input_context.AccessToken:
         raise ValueError("AccessToken is not found in input_context.")    
     
-    prompt = create_math_prompt_template()
+    prompt = create_math_prompt_template_2()
     json_parser = JsonOutputParser()
     text_parser = StrOutputParser()
     save_response = RunnableLambda(lambda x: save_text_and_pass(x))
     clean_up_response = RunnableLambda(lambda x: clean_up_json(x))
-    prepare = RunnableLambda(lambda x: prepare_problems(x, input_context.StartNum))
+    prepare = RunnableLambda(lambda x: prepare_problems(x, input_context.StartNum, input_context.ProblemYear))
     save = RunnableLambda(lambda x: save_problems(x, input_context.AccessToken, input_context.Production))
     
     input = RunnableParallel(
