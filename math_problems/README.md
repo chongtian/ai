@@ -8,9 +8,6 @@ This script starts a gradio interface, where user can enter any objective to gen
 ## cbe6.py
 This script focuses on the Fort Bend ISD CBE Math test, which includes nine distinct learning objectives. Users can select a specific objective and use an AI LLM to generate aligned math problems. The generated problems are saved to KidProblem and made available in the Staging environment, where parents can review them.
 
-## upload.py
-This script uploads math problems to KidProblem from a JSON file (see sample.json for the required format). Uploaded problems are placed in the Staging environment for parent review.
-
 ## copy_problems.py
 This script copies math problems from the KidProblem Staging environment to the Production environment. It allows parents to first validate and refine AI-generated problems before making them available for regular use.
 

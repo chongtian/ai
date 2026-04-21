@@ -1,6 +1,6 @@
 import json
 from langchain_core.prompts import PromptTemplate  
-from langchain_ollama import ChatOllama, OllamaLLM
+from langchain_ollama import OllamaLLM
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.runnables import RunnableParallel, RunnableLambda
@@ -143,7 +143,6 @@ def create_math_prompt_template_2():
     return prompt_template
 
 
-
 def get_json_schema(simple_schema = False) -> str:
     if simple_schema:
         return """
@@ -159,46 +158,6 @@ def get_json_schema(simple_schema = False) -> str:
         with open(config.SCHEMA_FILE, "r") as f:
             s = f.read()
         return s
-
-
-def get_objective(topic_num : int| None = None):
-    """
-    Read all objectives from a local text file, and return the objective
-
-    Args:
-        topic_num is the index of the objective in the collection of all objectives. It is zero-based.
-
-    Returns:
-        Objective or a collection of objectives
-        Objective has the schema: 
-            {
-            "objective":"the name of the objective", 
-            "count":"the count of the preoblems belong to the objective", 
-            "text":"objective details"
-            }
-        if the topic_num is within the range of all objectives, returns the exact objective.
-        otherwise, returns all objectives
-
-    """
-    with open(config.TOPCIS_FILE, "r", encoding="utf-8") as f:
-        s = f.read()
-    objectives = []
-    raw = s.split("########")
-    regex = re.compile(r"Objective:.+?(\d)\nCount:.+?(\d{1,2})(.*)", flags=re.DOTALL)
-    for t in raw:
-        objective = {}
-        matches = regex.finditer(t)
-        match = next(matches, None)
-        if match:
-            objective["objective"]=match.group(1)
-            objective["count"]=(int) (match.group(2))
-            objective["text"]=(match.group(3)).strip()
-            objectives.append(objective)
-    
-    if topic_num >=0 and topic_num < len(objectives):
-        return [objectives[topic_num]]      
-    else:
-        return objectives
 
 
 def save_text_and_pass(x:str):
@@ -249,12 +208,12 @@ def clean_up_json(x:str):
         return fixed
 
 
-def generate_cbe6_math_problems(llm, objective_num: int, simple_schema = False):
+def generate_math_problems(llm, objectives: list, simple_schema = False):
     """
     Generate math problems based on the objective and count specified in the input.
     Args:
         llm: the language model to be used for generating math problems
-        objective_num: the index of the objective in the collection of all objectives. It is zero-based.
+        objectives: a list of learning objectives.
         Returns:
         a list of generated math problems, each problem has the schema:
         {
@@ -285,16 +244,13 @@ def generate_cbe6_math_problems(llm, objective_num: int, simple_schema = False):
         | json_parser 
         )
 
-    objectives = get_objective(objective_num)
-    logger.info(f'Pull in {len(objectives)} objectives.')
-
     problems = []
     for idx, objective in enumerate(objectives):    
         inputs = {"count": objective.get("count", 1), "text": objective.get("text", None) }
-        logger.info(f"Processing objective {idx + 1} ... ")
+        logger.info(f"Processing #{idx + 1} objective which is Objective {objective.get("objective", "Unknown")} ... ")
         logger.debug(inputs)
         response = chain.invoke(inputs)
-        logger.info(f"objective {idx + 1} has been processed. ")
+        logger.info(f"#{idx + 1} objective has been processed. ")
         problems.extend(response)
     
     return problems

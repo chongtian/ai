@@ -5,5 +5,6 @@ OPENAI_MODEL_ID = "gpt-4o-mini"
 OPENAI_TEMPERATURE = 0.2
 
 SCHEMA_FILE = "ai_problem_schema.json"
-TOPCIS_FILE = "objectives.txt"
+TOPCIS_FILE = "resource_objectives.txt"
 LOGS_FOLDER = "logs"
+PROMPTS_FOLDER = "prompts"

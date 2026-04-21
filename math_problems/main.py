@@ -1,6 +1,6 @@
 import gradio as gr
 import os 
-from get_problems import generate_and_save_math_problems, initialize_openai_llm, initialize_local_llm
+from ai_problems import generate_and_save_math_problems, initialize_openai_llm, initialize_local_llm
 from kidproblem_apis import get_access_token_from_cognito
 import logging
 import sys
