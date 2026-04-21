@@ -89,4 +89,4 @@ instance/
 .hypothesis/
 
 # exclude the script for setting environment variables
-math_problems/set_env.ps1
+**/set_env.ps1
