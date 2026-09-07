@@ -1,0 +1,4 @@
+langchain==1.2.12
+langchain_ollama==1.0.1
+langchain_openai==1.1.12
+pydantic==2.12.5
